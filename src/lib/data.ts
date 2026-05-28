@@ -56,3 +56,28 @@ export const getPortDayWindow = (portSlug: string, date: string): TideEvent[] =>
   if (!file) return [];
   return getDayWindow(file, date);
 };
+
+export type CoverageStatus = {
+  windowIncomplete: boolean;
+  sourceQuiet: boolean;
+  ageDays: number;
+  missingDates: string[];
+};
+
+const MS_PER_DAY = 86_400_000;
+
+export const coverageStatus = (
+  data: PortDataFile,
+  dates: string[],
+  now: Date,
+): CoverageStatus => {
+  const missingDates = dates.filter((d) => !data.days[d]);
+  const ageMs = now.getTime() - new Date(data.lastScrapeOk).getTime();
+  const ageDays = Math.round(ageMs / MS_PER_DAY);
+  return {
+    windowIncomplete: missingDates.length > 0,
+    sourceQuiet: ageDays > 7,
+    ageDays,
+    missingDates,
+  };
+};

@@ -1,6 +1,6 @@
 ---
 import { ports, getPort } from '~/lib/ports';
-import { getPortDayWindow, portData } from '~/lib/data';
+import { coverageStatus, getPortDayWindow, portData } from '~/lib/data';
 import { isoDate, next5Days } from '~/lib/time';
 import Forecast from '~/components/Forecast.svelte';
 import '~/styles/global.css';
@@ -26,6 +26,11 @@ const cards = dates.map((date, i) => ({
 const allDays = portData[portSlug]?.days ?? {};
 const labelKind: 'registado' | 'anual' =
   Object.keys(allDays).length >= 365 ? 'anual' : 'registado';
+
+const portFile = portData[portSlug];
+const coverage = portFile
+  ? coverageStatus(portFile, dates, new Date())
+  : null;
 ---
 
 <html lang="pt-PT">
@@ -39,6 +44,16 @@ const labelKind: 'registado' | 'anual' =
       <header>
         <h1>{port!.name}</h1>
       </header>
+      {coverage?.windowIncomplete && (
+        <div class="stale-banner" data-banner="window-incomplete">
+          Sem dados completos para esta semana — fonte temporariamente indisponível.
+        </div>
+      )}
+      {coverage?.sourceQuiet && (
+        <div class="stale-banner" data-banner="source-quiet">
+          Fonte sem atualizações há {coverage.ageDays} dias — dados podem desatualizar em breve.
+        </div>
+      )}
       <Forecast client:load cards={cards} port={port} allDays={allDays} labelKind={labelKind} />
     </main>
   </body>
