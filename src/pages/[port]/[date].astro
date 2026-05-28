@@ -41,7 +41,7 @@ const showStaleBanner = ageDays !== null && ageDays > 2;
     <main>
       <header>
         <h1>{port!.name}</h1>
-        <p class="muted">{formatDate(new Date(`${date}T12:00:00+01:00`))}</p>
+        <p class="muted">{formatDate(new Date(`${date}T12:00:00Z`))}</p>
       </header>
 
       {

@@ -8,6 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "scrape:all": "node --import tsx/esm scrapers/run-all.ts",
     "scrape:lisboa": "node --import tsx/esm scrapers/lisboa.ts"
   },
@@ -21,6 +23,7 @@
     "@types/node": "^22.0.0",
     "@types/suncalc": "^1.9.2",
     "tsx": "^4.20.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.1.7"
   }
 }

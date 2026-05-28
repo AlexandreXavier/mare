@@ -1,6 +1,6 @@
 <script lang="ts">
   import { interpolateCurve, type TideEvent } from '~/lib/tides';
-  import { formatTime } from '~/lib/time';
+  import { formatTime, lisbonMidnight } from '~/lib/time';
 
   interface Props {
     events: TideEvent[];
@@ -9,7 +9,7 @@
 
   let { events, date }: Props = $props();
 
-  const dayStart = new Date(`${date}T00:00:00+01:00`);
+  const dayStart = lisbonMidnight(date);
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
 
   const curve = interpolateCurve(events, dayStart, dayEnd, 144);

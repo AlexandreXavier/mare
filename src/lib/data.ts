@@ -37,3 +37,22 @@ export const availableDates = (portSlug: string): string[] => {
   if (!file) return [];
   return Object.keys(file.days).sort();
 };
+
+const shiftDate = (date: string, days: number): string => {
+  const t = new Date(`${date}T00:00:00Z`);
+  t.setUTCDate(t.getUTCDate() + days);
+  return t.toISOString().slice(0, 10);
+};
+
+export const getDayWindow = (data: PortDataFile, date: string): TideEvent[] => {
+  const dates = [shiftDate(date, -1), date, shiftDate(date, 1)];
+  return dates
+    .flatMap((d) => data.days[d]?.events ?? [])
+    .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+};
+
+export const getPortDayWindow = (portSlug: string, date: string): TideEvent[] => {
+  const file = portData[portSlug];
+  if (!file) return [];
+  return getDayWindow(file, date);
+};

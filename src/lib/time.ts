@@ -23,6 +23,17 @@ export const formatDate = (date: Date): string => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+export const lisbonMidnight = (date: string): Date => {
+  const candidate = new Date(`${date}T00:00:00Z`);
+  const lisbonHour = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Lisbon',
+    hour: '2-digit',
+    hour12: false,
+  }).format(candidate);
+  if (lisbonHour === '00') return candidate;
+  return new Date(candidate.getTime() - 3600 * 1000);
+};
+
 export const isoDate = (date: Date): string => {
   const parts = new Intl.DateTimeFormat('en-CA', {
     year: 'numeric',
