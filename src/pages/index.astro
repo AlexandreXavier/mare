@@ -1,16 +1,7 @@
 ---
 import { ports } from '~/lib/ports';
-import { availableDates, portData } from '~/lib/data';
-import { isoDate } from '~/lib/time';
+import { portData } from '~/lib/data';
 import '~/styles/global.css';
-
-const today = isoDate(new Date());
-
-const fallbackDateFor = (slug: string): string => {
-  const dates = availableDates(slug);
-  if (dates.length === 0) return today;
-  return dates.includes(today) ? today : dates[0];
-};
 ---
 
 <html lang="pt-PT">
@@ -28,10 +19,9 @@ const fallbackDateFor = (slug: string): string => {
       <div class="port-grid">
         {
           ports.map((p) => {
-            const date = fallbackDateFor(p.slug);
             const hasData = portData[p.slug] !== undefined;
             return (
-              <a class="port-card" href={`/${p.slug}/${date}`}>
+              <a class="port-card" href={`/${p.slug}`}>
                 <span>{p.name}</span>
                 <span class="chev">{hasData ? '›' : '—'}</span>
               </a>

@@ -23,6 +23,16 @@ export const formatDate = (date: Date): string => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+export const next5Days = (today: string): string[] => {
+  const out: string[] = [];
+  for (let i = 0; i < 5; i++) {
+    const t = new Date(`${today}T00:00:00Z`);
+    t.setUTCDate(t.getUTCDate() + i);
+    out.push(t.toISOString().slice(0, 10));
+  }
+  return out;
+};
+
 export const lisbonMidnight = (date: string): Date => {
   const candidate = new Date(`${date}T00:00:00Z`);
   const lisbonHour = new Intl.DateTimeFormat('en-GB', {

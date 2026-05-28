@@ -1,0 +1,41 @@
+---
+import { ports, getPort } from '~/lib/ports';
+import { getPortDayWindow } from '~/lib/data';
+import { isoDate, next5Days } from '~/lib/time';
+import Forecast from '~/components/Forecast.svelte';
+import '~/styles/global.css';
+
+export function getStaticPaths() {
+  return ports.map((p) => ({ params: { port: p.slug } }));
+}
+
+const { port: portSlug } = Astro.params as { port: string };
+const port = getPort(portSlug);
+if (!port) {
+  return Astro.redirect('/');
+}
+
+const today = isoDate(new Date());
+const dates = next5Days(today);
+const cards = dates.map((date, i) => ({
+  date,
+  events: getPortDayWindow(portSlug, date),
+  isToday: i === 0,
+}));
+---
+
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{port!.name} — Marés</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>{port!.name}</h1>
+      </header>
+      <Forecast client:load cards={cards} />
+    </main>
+  </body>
+</html>

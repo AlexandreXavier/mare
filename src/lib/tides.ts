@@ -46,6 +46,14 @@ const heightAt = (t: Date, events: TideEvent[]): number | null => {
   return null;
 };
 
+export const nextEvent = (now: Date, events: TideEvent[]): TideEvent | null => {
+  const ts = now.getTime();
+  const sorted = [...events].sort(
+    (a, b) => new Date(a.time).getTime() - new Date(b.time).getTime(),
+  );
+  return sorted.find((e) => new Date(e.time).getTime() > ts) ?? null;
+};
+
 export type TideState = 'rising' | 'falling';
 
 export const stateAt = (t: Date, events: TideEvent[]): TideState | null => {
