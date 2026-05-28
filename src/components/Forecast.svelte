@@ -3,6 +3,7 @@
   import { nextEvent, stateAt } from '~/lib/tides';
   import { countdownText } from '~/lib/now';
   import { formatTime } from '~/lib/time';
+  import type { Port } from '~/lib/ports';
   import DailyCard from './DailyCard.svelte';
 
   interface CardSpec {
@@ -13,9 +14,12 @@
 
   interface Props {
     cards: CardSpec[];
+    port: Port;
+    allDays: Record<string, { events: TideEvent[] }>;
+    labelKind: 'registado' | 'anual';
   }
 
-  let { cards }: Props = $props();
+  let { cards, port, allDays, labelKind }: Props = $props();
 
   let now = $state(new Date());
 
@@ -71,9 +75,24 @@
 
   {#each cards as card (card.date)}
     {#if card.isToday}
-      <DailyCard date={card.date} events={card.events} isToday {now} />
+      <DailyCard
+        date={card.date}
+        events={card.events}
+        isToday
+        {now}
+        {port}
+        {allDays}
+        {labelKind}
+      />
     {:else}
-      <DailyCard date={card.date} events={card.events} isToday={false} />
+      <DailyCard
+        date={card.date}
+        events={card.events}
+        isToday={false}
+        {port}
+        {allDays}
+        {labelKind}
+      />
     {/if}
   {/each}
 </div>

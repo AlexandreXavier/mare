@@ -1,15 +1,21 @@
 <script lang="ts">
   import { interpolateCurve, type TideEvent } from '~/lib/tides';
   import { formatTime, lisbonMidnight } from '~/lib/time';
+  import { getSunTimes } from '~/lib/sun';
+  import { amplitudePercent } from '~/lib/range';
+  import type { Port } from '~/lib/ports';
 
   interface Props {
     date: string;
     events: TideEvent[];
     isToday: boolean;
+    port: Port;
+    allDays: Record<string, { events: TideEvent[] }>;
+    labelKind: 'registado' | 'anual';
     now?: Date | null;
   }
 
-  let { date, events, isToday, now = null }: Props = $props();
+  let { date, events, isToday, port, allDays, labelKind, now = null }: Props = $props();
 
   const dayStart = lisbonMidnight(date);
   const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
@@ -50,6 +56,18 @@
     day: 'numeric',
     month: 'short',
   }).format(new Date(`${date}T12:00:00Z`));
+
+  const { sunrise, sunset } = getSunTimes(date, port);
+  const sunMarkers: Array<{ x: number; label: string; glyph: string; kind: 'sunrise' | 'sunset' }> = [];
+  for (const m of [{ t: sunrise, glyph: '☀', kind: 'sunrise' as const }, { t: sunset, glyph: '🌙', kind: 'sunset' as const }]) {
+    const ms = m.t.getTime();
+    if (ms >= dayStart.getTime() && ms < dayEnd.getTime()) {
+      sunMarkers.push({ x: xOf(m.t), label: formatTime(m.t), glyph: m.glyph, kind: m.kind });
+    }
+  }
+
+  const pct = amplitudePercent(dayEvents, allDays);
+  const pctRounded = Math.round(pct);
 </script>
 
 <article class="card" class:today={isToday}>
@@ -73,6 +91,32 @@
       <path d={fillPath} fill={`url(#tide-fill-${date})`} />
       <path d={linePath} fill="none" stroke="var(--tide-high)" stroke-width="2" stroke-linejoin="round" />
     {/if}
+
+    {#each sunMarkers as m (m.kind)}
+      <line
+        x1={m.x}
+        x2={m.x}
+        y1={PAD_Y * 0.55}
+        y2={H - PAD_Y * 0.5}
+        stroke="var(--muted)"
+        stroke-width="1"
+        stroke-dasharray="2 3"
+        opacity="0.4"
+      />
+      <text
+        x={m.x}
+        y={PAD_Y * 0.45}
+        text-anchor="middle"
+        font-size="11"
+      >{m.glyph}</text>
+      <text
+        x={m.x}
+        y={PAD_Y * 0.45 + 10}
+        text-anchor="middle"
+        font-size="9"
+        fill="var(--muted)"
+      >{m.label}</text>
+    {/each}
 
     {#each dayEvents as ev (ev.time)}
       {@const cx = xOf(new Date(ev.time))}
@@ -125,6 +169,13 @@
       </text>
     {/each}
   </svg>
+
+  <div class="amplitude" aria-label={`Amplitude: ${pctRounded}% do máximo ${labelKind}`}>
+    <div class="amplitude-bar">
+      <div class="amplitude-fill" style="width: {pctRounded}%"></div>
+    </div>
+    <span class="amplitude-label">Amplitude: {pctRounded}% do máximo {labelKind}</span>
+  </div>
 </article>
 
 <style>
@@ -157,5 +208,25 @@
     width: 100%;
     height: auto;
     display: block;
+  }
+  .amplitude {
+    margin-top: 6px;
+  }
+  .amplitude-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .amplitude-fill {
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.65;
+  }
+  .amplitude-label {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.75rem;
+    color: var(--muted);
   }
 </style>
