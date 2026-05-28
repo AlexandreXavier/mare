@@ -1,0 +1,44 @@
+---
+import { ports } from '~/lib/ports';
+import { availableDates, portData } from '~/lib/data';
+import { isoDate } from '~/lib/time';
+import '~/styles/global.css';
+
+const today = isoDate(new Date());
+
+const fallbackDateFor = (slug: string): string => {
+  const dates = availableDates(slug);
+  if (dates.length === 0) return today;
+  return dates.includes(today) ? today : dates[0];
+};
+---
+
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Marés em Portugal</title>
+    <meta name="description" content="Previsões de marés para os principais portos de Portugal continental." />
+  </head>
+  <body>
+    <main>
+      <h1>Marés</h1>
+      <p class="muted">Previsões para os principais portos de Portugal continental.</p>
+
+      <div class="port-grid">
+        {
+          ports.map((p) => {
+            const date = fallbackDateFor(p.slug);
+            const hasData = portData[p.slug] !== undefined;
+            return (
+              <a class="port-card" href={`/${p.slug}/${date}`}>
+                <span>{p.name}</span>
+                <span class="chev">{hasData ? '›' : '—'}</span>
+              </a>
+            );
+          })
+        }
+      </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "name": "mare",
+  "type": "module",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "scrape:all": "node --import tsx/esm scrapers/run-all.ts",
+    "scrape:lisboa": "node --import tsx/esm scrapers/lisboa.ts"
+  },
+  "dependencies": {
+    "@astrojs/svelte": "^7.1.0",
+    "astro": "^5.13.0",
+    "suncalc": "^1.9.0",
+    "svelte": "^5.20.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/suncalc": "^1.9.2",
+    "tsx": "^4.20.0",
+    "typescript": "^5.7.0"
+  }
+}

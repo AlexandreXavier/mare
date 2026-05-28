@@ -1,0 +1,66 @@
+---
+import { ports, getPort } from '~/lib/ports';
+import { availableDates, getDay } from '~/lib/data';
+import { formatDate } from '~/lib/time';
+import TideChart from '~/components/TideChart.svelte';
+import '~/styles/global.css';
+
+export function getStaticPaths() {
+  const paths: { params: { port: string; date: string } }[] = [];
+  for (const p of ports) {
+    for (const d of availableDates(p.slug)) {
+      paths.push({ params: { port: p.slug, date: d } });
+    }
+  }
+  return paths;
+}
+
+const { port: portSlug, date } = Astro.params as { port: string; date: string };
+const port = getPort(portSlug);
+if (!port) {
+  return Astro.redirect('/');
+}
+
+const day = getDay(portSlug, date);
+const events = day?.events ?? [];
+
+const lastScrape = day ? new Date(day.lastScrapeOk) : null;
+const ageDays = lastScrape
+  ? Math.floor((Date.now() - lastScrape.getTime()) / (1000 * 60 * 60 * 24))
+  : null;
+const showStaleBanner = ageDays !== null && ageDays > 2;
+---
+
+<html lang="pt-PT">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{port!.name} — Marés — {date}</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>{port!.name}</h1>
+        <p class="muted">{formatDate(new Date(`${date}T12:00:00+01:00`))}</p>
+      </header>
+
+      {
+        showStaleBanner && (
+          <div class="stale-banner">
+            Última atualização há {ageDays} dias — fonte temporariamente indisponível.
+          </div>
+        )
+      }
+
+      {
+        events.length === 0 ? (
+          <p class="empty">Sem dados disponíveis para esta data.</p>
+        ) : (
+          <div class="card">
+            <TideChart client:load events={events} date={date} />
+          </div>
+        )
+      }
+    </main>
+  </body>
+</html>
