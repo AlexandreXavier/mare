@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`leixoes — IH 14-day fixture > matches snapshot for 2026-05-29 1`] = `
+{
+  "events": [
+    {
+      "height": 2.99,
+      "time": "2026-05-29T00:27:00Z",
+      "type": "high",
+    },
+    {
+      "height": 0.94,
+      "time": "2026-05-29T06:32:00Z",
+      "type": "low",
+    },
+    {
+      "height": 3.12,
+      "time": "2026-05-29T12:46:00Z",
+      "type": "high",
+    },
+    {
+      "height": 0.95,
+      "time": "2026-05-29T18:54:00Z",
+      "type": "low",
+    },
+  ],
+}
+`;

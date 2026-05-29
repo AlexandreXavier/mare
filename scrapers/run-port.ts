@@ -1,6 +1,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { scrape as scrapeLeixoes } from './leixoes';
 import { scrape as scrapeLisboa } from './lisboa';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -8,6 +9,7 @@ const DATA_DIR = join(__dirname, '..', 'data');
 
 const scrapers: Record<string, () => Promise<unknown>> = {
   lisboa: scrapeLisboa,
+  leixoes: scrapeLeixoes,
 };
 
 const main = async () => {

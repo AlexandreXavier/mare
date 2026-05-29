@@ -7,6 +7,7 @@ import {
 } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { scrape as scrapeLeixoes } from './leixoes';
 import { scrape as scrapeLisboa } from './lisboa';
 import { mergePortFile, type ScrapeResult, type StoredFile } from './lib/merge';
 
@@ -20,6 +21,7 @@ type PortScraper = {
 
 export const scrapers: PortScraper[] = [
   { slug: 'lisboa', scrape: scrapeLisboa },
+  { slug: 'leixoes', scrape: scrapeLeixoes },
 ];
 
 const lisbonCivilToday = (): string => {

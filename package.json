@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "scrape:all": "node --import tsx/esm scrapers/run-all.ts",
-    "scrape:lisboa": "node --import tsx/esm scrapers/run-port.ts lisboa"
+    "scrape:lisboa": "node --import tsx/esm scrapers/run-port.ts lisboa",
+    "scrape:leixoes": "node --import tsx/esm scrapers/run-port.ts leixoes"
   },
   "dependencies": {
     "@astrojs/svelte": "^7.1.0",
