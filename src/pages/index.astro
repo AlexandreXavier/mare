@@ -13,7 +13,7 @@ import '~/styles/global.css';
     <meta name="description" content="Previsões de marés para os principais portos de Portugal continental." />
   </head>
   <body>
-    <main>
+    <main id="main-shell">
       <h1>Marés</h1>
       <p class="muted">Previsões para os principais portos de Portugal continental.</p>
 
@@ -45,26 +45,40 @@ import '~/styles/global.css';
       </div>
     </main>
 
+    <div id="map-slot"></div>
+
     <script>
+      import { mount } from 'svelte';
       import { ports } from '~/lib/ports';
       import {
         getCurrentPosition,
         nearestPort,
         permissionState,
+        type Fix,
       } from '~/lib/geolocation';
 
+      const shell = document.getElementById('main-shell');
       const grid = document.getElementById('port-grid');
       const gateSlot = document.getElementById('gate-slot');
       const fallbackBtn = document.getElementById('locate-fallback');
+      const mapSlot = document.getElementById('map-slot');
+      const url = new URL(window.location.href);
+      const forceList = url.searchParams.has('list');
+
+      let mapMounted = false;
+      const showMap = async (fix: Fix) => {
+        if (mapMounted || !mapSlot) return;
+        mapMounted = true;
+        if (shell) shell.hidden = true;
+        const { default: MapPicker } = await import('~/components/MapPicker.svelte');
+        mount(MapPicker, { target: mapSlot, props: { fix } });
+      };
 
       const goNearest = async () => {
         try {
           const fix = await getCurrentPosition();
-          const nearest = nearestPort(fix, ports);
-          if (nearest) {
-            window.location.replace(`/${nearest.port.slug}`);
-            return;
-          }
+          await showMap(fix);
+          return;
         } catch {
           /* fall through to reveal grid */
         }
@@ -85,6 +99,10 @@ import '~/styles/global.css';
       });
 
       (async () => {
+        if (forceList) {
+          // Escape hatch from the map view: keep the grid visible.
+          return;
+        }
         const state = await permissionState();
         if (state === 'granted') {
           if (grid) grid.hidden = true;
