@@ -1,0 +1,78 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`lisboa.parse > matches snapshot for the first three days 1`] = `
+{
+  "2026-01-01": {
+    "events": [
+      {
+        "height": 3.3,
+        "time": "2026-01-01T00:48:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.8,
+        "time": "2026-01-01T06:50:00Z",
+        "type": "low",
+      },
+      {
+        "height": 3.3,
+        "time": "2026-01-01T13:19:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.8,
+        "time": "2026-01-01T19:13:00Z",
+        "type": "low",
+      },
+    ],
+  },
+  "2026-01-02": {
+    "events": [
+      {
+        "height": 3.5,
+        "time": "2026-01-02T01:46:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.7,
+        "time": "2026-01-02T07:48:00Z",
+        "type": "low",
+      },
+      {
+        "height": 3.4,
+        "time": "2026-01-02T14:17:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.7,
+        "time": "2026-01-02T20:06:00Z",
+        "type": "low",
+      },
+    ],
+  },
+  "2026-01-03": {
+    "events": [
+      {
+        "height": 3.7,
+        "time": "2026-01-03T02:40:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.5,
+        "time": "2026-01-03T08:42:00Z",
+        "type": "low",
+      },
+      {
+        "height": 3.5,
+        "time": "2026-01-03T15:10:00Z",
+        "type": "high",
+      },
+      {
+        "height": 0.7,
+        "time": "2026-01-03T20:06:00Z",
+        "type": "low",
+      },
+    ],
+  },
+}
+`;
