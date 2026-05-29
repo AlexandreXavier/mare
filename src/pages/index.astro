@@ -1,6 +1,7 @@
 ---
 import { ports } from '~/lib/ports';
 import { portData } from '~/lib/data';
+import LocationGate from '~/components/LocationGate.svelte';
 import '~/styles/global.css';
 ---
 
@@ -16,7 +17,20 @@ import '~/styles/global.css';
       <h1>Marés</h1>
       <p class="muted">Previsões para os principais portos de Portugal continental.</p>
 
-      <div class="port-grid">
+      <div id="gate-slot" hidden>
+        <LocationGate client:load />
+      </div>
+
+      <button
+        type="button"
+        id="locate-fallback"
+        class="locate-fallback"
+        hidden
+      >
+        Localizar-me
+      </button>
+
+      <div class="port-grid" id="port-grid">
         {
           ports.map((p) => {
             const hasData = portData[p.slug] !== undefined;
@@ -30,5 +44,61 @@ import '~/styles/global.css';
         }
       </div>
     </main>
+
+    <script>
+      import { ports } from '~/lib/ports';
+      import {
+        getCurrentPosition,
+        nearestPort,
+        permissionState,
+      } from '~/lib/geolocation';
+
+      const grid = document.getElementById('port-grid');
+      const gateSlot = document.getElementById('gate-slot');
+      const fallbackBtn = document.getElementById('locate-fallback');
+
+      const goNearest = async () => {
+        try {
+          const fix = await getCurrentPosition();
+          const nearest = nearestPort(fix, ports);
+          if (nearest) {
+            window.location.replace(`/${nearest.port.slug}`);
+            return;
+          }
+        } catch {
+          /* fall through to reveal grid */
+        }
+        if (gateSlot) gateSlot.hidden = true;
+        if (grid) grid.hidden = false;
+      };
+
+      const showGate = () => {
+        if (grid) grid.hidden = true;
+        if (gateSlot) gateSlot.hidden = false;
+        if (fallbackBtn) fallbackBtn.hidden = true;
+      };
+
+      document.addEventListener('mare:locate', goNearest);
+      document.addEventListener('mare:decline', () => {
+        if (gateSlot) gateSlot.hidden = true;
+        if (grid) grid.hidden = false;
+      });
+
+      (async () => {
+        const state = await permissionState();
+        if (state === 'granted') {
+          if (grid) grid.hidden = true;
+          goNearest();
+        } else if (state === 'prompt') {
+          showGate();
+        } else if (state === 'denied') {
+          // grid already visible as static fallback
+        } else {
+          // unavailable: keep grid visible and surface the locate button
+          if (fallbackBtn) fallbackBtn.hidden = false;
+          fallbackBtn?.addEventListener('click', showGate);
+        }
+      })();
+    </script>
   </body>
 </html>
