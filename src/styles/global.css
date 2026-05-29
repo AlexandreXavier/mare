@@ -128,3 +128,50 @@ h1 {
   text-align: center;
   padding: 32px 16px;
 }
+
+.port-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.port-header h1 {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.share-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.share-button:hover,
+.share-button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.copy-toast {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  background: var(--accent);
+  color: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 0.8125rem;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
