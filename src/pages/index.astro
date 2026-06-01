@@ -95,17 +95,22 @@ const labelKind: 'registado' | 'anual' =
       </button>
 
       <div id="fallback-view">
-        <form class="port-picker" autocomplete="off">
-          <label for="port-select">Porto</label>
-          <select id="port-select" name="port">
-            {
-              ports.map((p) => (
-                <option value={p.slug} selected={p.slug === defaultSlug}>
-                  {p.name}
-                </option>
-              ))
-            }
-          </select>
+        <form class="port-picker" autocomplete="off" id="port-form">
+          <label for="port-input">Porto</label>
+          <input
+            id="port-input"
+            type="search"
+            name="port"
+            list="port-options"
+            value={port.name}
+            placeholder="Pesquisar porto…"
+            autocomplete="off"
+            spellcheck="false"
+            enterkeyhint="go"
+          />
+          <datalist id="port-options">
+            {ports.map((p) => <option value={p.name} />)}
+          </datalist>
         </form>
 
         <Forecast
@@ -137,15 +142,24 @@ const labelKind: 'registado' | 'anual' =
       const gateSlot = document.getElementById('gate-slot');
       const fallbackBtn = document.getElementById('locate-fallback');
       const mapSlot = document.getElementById('map-slot');
-      const portSelect = document.getElementById('port-select') as
-        | HTMLSelectElement
+      const portInput = document.getElementById('port-input') as
+        | HTMLInputElement
         | null;
+      const portForm = document.getElementById('port-form') as
+        | HTMLFormElement
+        | null;
+      const slugByName = new Map(ports.map((p) => [p.name, p.slug]));
       const url = new URL(window.location.href);
       const forceList = url.searchParams.has('list');
 
-      portSelect?.addEventListener('change', () => {
-        const slug = portSelect.value;
+      const goByName = () => {
+        const slug = slugByName.get(portInput?.value.trim() ?? '');
         if (slug) window.location.assign(`/${slug}`);
+      };
+      portInput?.addEventListener('change', goByName);
+      portForm?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        goByName();
       });
 
       const currentTheme = (): 'light' | 'dark' => {

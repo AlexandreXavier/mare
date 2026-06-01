@@ -256,31 +256,47 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 0; }
   letter-spacing: 0.05em;
 }
 
-.port-picker select {
+.port-picker input {
   flex: 1;
-  padding: 8px 12px;
+  min-width: 0;
+  padding: 8px 36px 8px 12px;
   background: transparent;
   border: 1px solid var(--text);
   border-radius: 0;
   color: var(--text);
   font-family: var(--font-sans);
   font-size: 1rem;
-  cursor: pointer;
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
-                    linear-gradient(135deg, currentColor 50%, transparent 50%);
-  background-position: calc(100% - 16px) calc(50% - 2px),
-                       calc(100% - 11px) calc(50% - 2px);
-  background-size: 5px 5px, 5px 5px;
+  /* Tabler-style magnifying glass, stroked currentColor, lives at the
+     right edge of the input. */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'><circle cx='11' cy='11' r='6'/><path d='m20 20-3.5-3.5'/></svg>");
   background-repeat: no-repeat;
-  padding-right: 32px;
+  background-position: right 10px center;
+  background-size: 16px 16px;
 }
 
-.port-picker select:hover,
-.port-picker select:focus {
+.port-picker input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(45deg, transparent 45%, currentColor 45% 55%, transparent 55%),
+              linear-gradient(-45deg, transparent 45%, currentColor 45% 55%, transparent 55%);
+  cursor: pointer;
+  opacity: 0.6;
+  margin-right: 22px;
+}
+
+.port-picker input:hover,
+.port-picker input:focus {
   border-color: var(--accent);
   color: var(--accent);
   outline: none;
+}
+
+.port-picker input::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 /* ---------- Stale banners ---------- */
