@@ -369,3 +369,39 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 0; }
   text-align: center;
   padding: 32px 16px;
 }
+
+/* ---------- Site footer ---------- */
+.site-footer {
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+
+.site-footer hr {
+  margin: 0 0 16px;
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  align-items: baseline;
+  margin: 0 0 8px;
+}
+
+.site-footer-links a {
+  color: var(--muted);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-underline-offset: 4px;
+}
+
+.site-footer-links a:hover { color: var(--accent); }
+
+.site-footer-links .dot { color: var(--muted); opacity: 0.6; }
+
+.site-footer-copy {
+  margin: 0;
+  color: var(--muted);
+}

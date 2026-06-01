@@ -4,6 +4,7 @@ import { getPortDayWindow, portData } from '~/lib/data';
 import { isoDate, next5Days } from '~/lib/time';
 import Forecast from '~/components/Forecast.svelte';
 import LocationGate from '~/components/LocationGate.svelte';
+import Footer from '~/components/Footer.astro';
 import '~/styles/global.css';
 
 const defaultSlug = 'leixoes';
@@ -115,6 +116,8 @@ const labelKind: 'registado' | 'anual' =
           labelKind={labelKind}
         />
       </div>
+
+      <Footer />
     </main>
 
     <div id="map-slot"></div>
