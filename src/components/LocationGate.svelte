@@ -41,11 +41,11 @@
 
 <style>
   .location-gate {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
+    background: transparent;
+    border: 1px solid var(--text);
+    border-radius: 0;
     padding: 20px 16px;
-    text-align: center;
+    text-align: left;
     margin-bottom: 16px;
   }
 
@@ -53,12 +53,14 @@
     margin: 0 0 8px;
     font-size: 1.125rem;
     font-weight: 600;
+    font-family: var(--font-sans);
   }
 
   .location-gate p {
     margin: 0 0 16px;
     font-size: 0.9375rem;
-    line-height: 1.4;
+    line-height: 1.5;
+    color: var(--muted);
   }
 
   .gate-actions {
@@ -69,18 +71,30 @@
 
   .gate-actions button {
     padding: 10px 16px;
-    border-radius: 10px;
+    border-radius: 0;
     font-size: 1rem;
+    font-family: var(--font-sans);
     cursor: pointer;
-    border: 1px solid var(--border);
-    background: var(--surface);
+    border: 1px solid var(--text);
+    background: transparent;
     color: var(--text);
+    transition: color 120ms ease, border-color 120ms ease, background 120ms ease;
+  }
+
+  .gate-actions button:hover {
+    color: var(--accent);
+    border-color: var(--accent);
   }
 
   .gate-actions .primary {
     background: var(--accent);
     border-color: var(--accent);
-    color: white;
+    color: var(--bg);
+  }
+
+  .gate-actions .primary:hover {
+    background: transparent;
+    color: var(--accent);
   }
 
   .gate-actions .primary:disabled {
@@ -90,5 +104,6 @@
 
   .gate-actions .secondary {
     color: var(--muted);
+    border-color: var(--border);
   }
 </style>

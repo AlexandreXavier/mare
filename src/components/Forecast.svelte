@@ -106,14 +106,17 @@
   .callout {
     margin: 0 0 4px;
     padding: 10px 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: transparent;
+    border: 1px solid var(--text);
+    border-radius: 0;
     font-size: 0.95rem;
     line-height: 1.3;
+    font-family: var(--font-mono);
   }
   .callout .direction {
-    font-weight: 600;
+    font-weight: 500;
+    font-family: var(--font-sans);
+    font-style: italic;
   }
   .callout .sep {
     margin: 0 6px;

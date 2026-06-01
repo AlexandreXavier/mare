@@ -113,14 +113,18 @@
     top: 12px;
     right: 12px;
     z-index: 500;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
+    background: var(--bg);
+    border: 1px solid var(--text);
+    border-radius: 0;
     padding: 6px 10px;
     font-size: 0.875rem;
     color: var(--text);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    text-decoration: underline;
+    text-decoration-style: dashed;
+    text-underline-offset: 4px;
   }
+
+  .map-escape:hover { color: var(--accent); border-color: var(--accent); }
 
   .map-nearest {
     position: absolute;
@@ -133,12 +137,13 @@
     grid-template-rows: auto auto;
     align-items: center;
     column-gap: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
+    background: var(--bg);
+    border: 1px solid var(--text);
+    border-radius: 0;
     padding: 10px 14px;
     color: var(--text);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+    font-family: var(--font-mono);
   }
 
   .map-nearest .muted {
@@ -146,13 +151,15 @@
     grid-row: 1;
     font-size: 0.75rem;
     color: var(--muted);
+    font-family: var(--font-sans);
   }
 
   .map-nearest strong {
     grid-column: 1;
     grid-row: 2;
     font-size: 1rem;
-    font-weight: 600;
+    font-weight: 500;
+    font-family: var(--font-sans);
   }
 
   .map-nearest .km {
@@ -164,8 +171,7 @@
 
   :global(.mare-marker) {
     border-radius: 50%;
-    border: 2px solid var(--surface);
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--bg);
   }
 
   :global(.mare-marker--port) {
@@ -174,6 +180,6 @@
 
   :global(.mare-marker--user) {
     background: var(--accent);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent);
+    outline: 3px solid rgba(var(--color-accent-rgb), 0.3);
   }
 </style>

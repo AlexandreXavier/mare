@@ -84,15 +84,8 @@
   </header>
 
   <svg viewBox="0 0 {W} {H}" class="chart" role="img" aria-label={`Curva de marés — ${isToday ? 'hoje' : weekdayLabel}`}>
-    <defs>
-      <linearGradient id={`tide-fill-${date}`} x1="0" x2="0" y1="0" y2="1">
-        <stop offset="0%" stop-color="var(--tide-high)" stop-opacity="0.55" />
-        <stop offset="100%" stop-color="var(--tide-high)" stop-opacity="0.05" />
-      </linearGradient>
-    </defs>
-
     {#if fillPath}
-      <path d={fillPath} fill={`url(#tide-fill-${date})`} />
+      <path d={fillPath} fill="var(--tide-high)" fill-opacity="0.18" />
       <path d={linePath} fill="none" stroke="var(--tide-high)" stroke-width="2" stroke-linejoin="round" />
     {/if}
 
@@ -114,6 +107,7 @@
         font-size="11"
       >{m.glyph}</text>
       <text
+        class="hour-label"
         x={m.x}
         y={22}
         text-anchor="middle"
@@ -132,16 +126,15 @@
         y={cy + (isHigh ? -28 : 10)}
         width="52"
         height="18"
-        rx="9"
         fill={isHigh ? 'var(--tide-high)' : 'var(--tide-low)'}
       />
       <text
+        class="tide-pill-label"
         x={cx}
         y={cy + (isHigh ? -15 : 23)}
         text-anchor="middle"
         font-size="11"
-        fill="#fff"
-        font-weight="600"
+        font-weight="500"
       >
         {formatTime(new Date(ev.time))}
       </text>
@@ -163,6 +156,7 @@
 
     {#each [0, 6, 12, 18, 24] as hr}
       <text
+        class="hour-label"
         x={xOf(new Date(dayStart.getTime() + hr * 3600 * 1000))}
         y={H - 8}
         text-anchor="middle"
@@ -184,53 +178,64 @@
 
 <style>
   .card {
-    background: var(--surface);
+    background: transparent;
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 0;
     padding: 10px 14px;
+    margin-bottom: 12px;
   }
   .card.today {
     padding: 14px 16px;
+    border-color: var(--text);
   }
   .card-label {
     margin-bottom: 4px;
     font-size: 0.9rem;
+    font-family: var(--font-mono);
   }
   .chip {
     display: inline-block;
-    padding: 2px 10px;
-    border-radius: 999px;
-    background: var(--tide-high);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 600;
+    padding: 2px 8px;
+    background: var(--accent);
+    color: var(--bg);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-family: var(--font-mono);
   }
-  .muted {
-    color: var(--muted);
-  }
+  .muted { color: var(--muted); }
   .chart {
     width: 100%;
     height: auto;
     display: block;
   }
+  /* Mono on tide-pill labels and hour labels so the 00h48 / 06h format
+     gets the column-aligned monospaced look. */
+  .chart :global(.tide-pill-label) {
+    font-family: var(--font-mono);
+    fill: var(--bg);
+  }
+  .chart :global(.hour-label) {
+    font-family: var(--font-mono);
+  }
   .amplitude {
-    margin-top: 6px;
+    margin-top: 8px;
   }
   .amplitude-bar {
-    height: 6px;
+    height: 4px;
     background: var(--border);
-    border-radius: 3px;
     overflow: hidden;
   }
   .amplitude-fill {
     height: 100%;
     background: var(--accent);
-    opacity: 0.65;
   }
   .amplitude-label {
     display: block;
     margin-top: 4px;
     font-size: 0.75rem;
     color: var(--muted);
+    font-family: var(--font-mono);
   }
 </style>
