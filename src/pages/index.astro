@@ -1,8 +1,23 @@
 ---
-import { ports } from '~/lib/ports';
-import { portData } from '~/lib/data';
+import { ports, getPort } from '~/lib/ports';
+import { getPortDayWindow, portData } from '~/lib/data';
+import { isoDate, next5Days } from '~/lib/time';
+import Forecast from '~/components/Forecast.svelte';
 import LocationGate from '~/components/LocationGate.svelte';
 import '~/styles/global.css';
+
+const defaultSlug = 'leixoes';
+const port = getPort(defaultSlug)!;
+const today = isoDate(new Date());
+const dates = next5Days(today);
+const cards = dates.map((date, i) => ({
+  date,
+  events: getPortDayWindow(defaultSlug, date),
+  isToday: i === 0,
+}));
+const allDays = portData[defaultSlug]?.days ?? {};
+const labelKind: 'registado' | 'anual' =
+  Object.keys(allDays).length >= 365 ? 'anual' : 'registado';
 ---
 
 <html lang="pt-PT">
@@ -11,10 +26,58 @@ import '~/styles/global.css';
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Marés em Portugal</title>
     <meta name="description" content="Previsões de marés para os principais portos de Portugal continental." />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <script is:inline>
+      // Set data-theme before first paint to avoid theme flash.
+      (() => {
+        try {
+          const saved = localStorage.getItem('mare-theme');
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <main id="main-shell">
-      <h1>Marés</h1>
+      <header class="brand">
+        <img src="/icon.svg" alt="" class="brand-icon" aria-hidden="true" />
+        <h1>Marés</h1>
+        <button
+          type="button"
+          class="theme-toggle"
+          data-theme-toggle
+          aria-label="Alternar tema claro / escuro"
+          title="Alternar tema"
+        >
+          <svg
+            class="glyph-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+          </svg>
+          <svg
+            class="glyph-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+        </button>
+      </header>
       <p class="muted">Previsões para os principais portos de Portugal continental.</p>
 
       <div id="gate-slot" hidden>
@@ -30,18 +93,27 @@ import '~/styles/global.css';
         Localizar-me
       </button>
 
-      <div class="port-grid" id="port-grid">
-        {
-          ports.map((p) => {
-            const hasData = portData[p.slug] !== undefined;
-            return (
-              <a class="port-card" href={`/${p.slug}`}>
-                <span>{p.name}</span>
-                <span class="chev">{hasData ? '›' : '—'}</span>
-              </a>
-            );
-          })
-        }
+      <div id="fallback-view">
+        <form class="port-picker" autocomplete="off">
+          <label for="port-select">Porto</label>
+          <select id="port-select" name="port">
+            {
+              ports.map((p) => (
+                <option value={p.slug} selected={p.slug === defaultSlug}>
+                  {p.name}
+                </option>
+              ))
+            }
+          </select>
+        </form>
+
+        <Forecast
+          client:load
+          cards={cards}
+          port={port}
+          allDays={allDays}
+          labelKind={labelKind}
+        />
       </div>
     </main>
 
@@ -58,12 +130,37 @@ import '~/styles/global.css';
       } from '~/lib/geolocation';
 
       const shell = document.getElementById('main-shell');
-      const grid = document.getElementById('port-grid');
+      const fallback = document.getElementById('fallback-view');
       const gateSlot = document.getElementById('gate-slot');
       const fallbackBtn = document.getElementById('locate-fallback');
       const mapSlot = document.getElementById('map-slot');
+      const portSelect = document.getElementById('port-select') as
+        | HTMLSelectElement
+        | null;
       const url = new URL(window.location.href);
       const forceList = url.searchParams.has('list');
+
+      portSelect?.addEventListener('change', () => {
+        const slug = portSelect.value;
+        if (slug) window.location.assign(`/${slug}`);
+      });
+
+      const currentTheme = (): 'light' | 'dark' => {
+        const explicit = document.documentElement.getAttribute('data-theme');
+        if (explicit === 'light' || explicit === 'dark') return explicit;
+        return window.matchMedia('(prefers-color-scheme: dark)').matches
+          ? 'dark'
+          : 'light';
+      };
+      document
+        .querySelector<HTMLButtonElement>('[data-theme-toggle]')
+        ?.addEventListener('click', () => {
+          const next = currentTheme() === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('mare-theme', next);
+          } catch (_) {}
+        });
 
       let mapMounted = false;
       const showMap = async (fix: Fix) => {
@@ -80,14 +177,14 @@ import '~/styles/global.css';
           await showMap(fix);
           return;
         } catch {
-          /* fall through to reveal grid */
+          /* fall through to reveal the fallback view */
         }
         if (gateSlot) gateSlot.hidden = true;
-        if (grid) grid.hidden = false;
+        if (fallback) fallback.hidden = false;
       };
 
       const showGate = () => {
-        if (grid) grid.hidden = true;
+        if (fallback) fallback.hidden = true;
         if (gateSlot) gateSlot.hidden = false;
         if (fallbackBtn) fallbackBtn.hidden = true;
       };
@@ -95,24 +192,20 @@ import '~/styles/global.css';
       document.addEventListener('mare:locate', goNearest);
       document.addEventListener('mare:decline', () => {
         if (gateSlot) gateSlot.hidden = true;
-        if (grid) grid.hidden = false;
+        if (fallback) fallback.hidden = false;
       });
 
       (async () => {
-        if (forceList) {
-          // Escape hatch from the map view: keep the grid visible.
-          return;
-        }
+        if (forceList) return;
         const state = await permissionState();
         if (state === 'granted') {
-          if (grid) grid.hidden = true;
+          if (fallback) fallback.hidden = true;
           goNearest();
         } else if (state === 'prompt') {
           showGate();
         } else if (state === 'denied') {
-          // grid already visible as static fallback
+          // fallback already visible
         } else {
-          // unavailable: keep grid visible and surface the locate button
           if (fallbackBtn) fallbackBtn.hidden = false;
           fallbackBtn?.addEventListener('click', showGate);
         }

@@ -80,13 +80,28 @@
                'Liberation Mono', 'Courier New', monospace;
 }
 
-/* ---------- Tokens: Dark (auto via system preference) ---------- */
+/* ---------- Tokens: Dark ----------
+   Explicit override via [data-theme="dark"] (toggle button).
+   When no explicit theme is set, the system preference still wins. */
+:root[data-theme='dark'] {
+  --color-fill-rgb:       33, 39, 55;     /* deep navy */
+  --color-text-base-rgb:  234, 237, 243;
+  --color-accent-rgb:     255, 107, 1;    /* xani orange */
+  --color-card-rgb:       52, 63, 96;     /* dusty blue */
+  --color-card-muted-rgb: 138, 51, 2;
+  --color-border-rgb:     171, 75, 8;
+
+  --tide-low-rgb:         251, 113, 133;
+  --sunrise-rgb:          251, 191, 36;
+  --sunset-rgb:           251, 113, 133;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
-    --color-fill-rgb:       33, 39, 55;     /* deep navy */
+  :root:not([data-theme]) {
+    --color-fill-rgb:       33, 39, 55;
     --color-text-base-rgb:  234, 237, 243;
-    --color-accent-rgb:     255, 107, 1;    /* xani orange */
-    --color-card-rgb:       52, 63, 96;     /* dusty blue */
+    --color-accent-rgb:     255, 107, 1;
+    --color-card-rgb:       52, 63, 96;
     --color-card-muted-rgb: 138, 51, 2;
     --color-border-rgb:     171, 75, 8;
 
@@ -165,34 +180,107 @@ hr { border: 0; border-top: 1px solid var(--border); margin: 0; }
 .muted { color: var(--muted); }
 .mono  { font-family: var(--font-mono); }
 
-/* ---------- Index — port grid ---------- */
-.port-grid {
-  display: grid;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.port-card {
-  display: flex;
-  justify-content: space-between;
+/* ---------- Theme toggle (sun/moon) ---------- */
+.theme-toggle {
+  display: inline-flex;
   align-items: center;
-  padding: 14px 16px;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
   background: transparent;
-  border: 1px solid var(--border);
+  border: 1px solid var(--text);
   border-radius: 0;
-  text-decoration: none;
-  font-weight: 500;
-  transition: border-color 120ms ease, color 120ms ease;
+  color: var(--text);
+  cursor: pointer;
+  padding: 0;
+  transition: color 120ms ease, border-color 120ms ease;
 }
 
-.port-card:hover {
+.theme-toggle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+  transition: transform 200ms ease;
+}
+
+.theme-toggle:hover svg { transform: rotate(12deg); }
+
+/* Show the sun glyph (switch to light) when we're in dark mode, and the
+   moon glyph (switch to dark) when we're in light mode. The data-theme
+   attribute is set by the inline init script + the click handler. */
+.theme-toggle .glyph-sun  { display: none; }
+.theme-toggle .glyph-moon { display: block; }
+
+:root[data-theme='dark'] .theme-toggle .glyph-sun  { display: block; }
+:root[data-theme='dark'] .theme-toggle .glyph-moon { display: none; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .theme-toggle .glyph-sun  { display: block; }
+  :root:not([data-theme]) .theme-toggle .glyph-moon { display: none; }
+}
+
+/* ---------- Index — brand header + port picker ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 4px;
+}
+
+.brand-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--text);
+  display: block;
+  flex: 0 0 auto;
+}
+
+.brand h1 { margin: 0; flex: 1; }
+
+.port-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 16px 0;
+  font-family: var(--font-mono);
+}
+
+.port-picker label {
+  font-size: 0.875rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.port-picker select {
+  flex: 1;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid var(--text);
+  border-radius: 0;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%),
+                    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 16px) calc(50% - 2px),
+                       calc(100% - 11px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 32px;
+}
+
+.port-picker select:hover,
+.port-picker select:focus {
   border-color: var(--accent);
   color: var(--accent);
-}
-
-.port-card .chev {
-  color: var(--muted);
-  font-family: var(--font-mono);
+  outline: none;
 }
 
 /* ---------- Stale banners ---------- */

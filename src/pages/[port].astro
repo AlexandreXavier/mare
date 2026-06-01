@@ -43,11 +43,55 @@ const coverage = portFile
       property="og:description"
       content={`Previsões de marés nos próximos 5 dias em ${port!.name}, Portugal.`}
     />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <script is:inline>
+      (() => {
+        try {
+          const saved = localStorage.getItem('mare-theme');
+          if (saved === 'light' || saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', saved);
+          }
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <main>
       <header class="port-header">
         <h1>{port!.name}</h1>
+        <button
+          type="button"
+          class="theme-toggle"
+          data-theme-toggle
+          aria-label="Alternar tema claro / escuro"
+          title="Alternar tema"
+        >
+          <svg
+            class="glyph-moon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+          </svg>
+          <svg
+            class="glyph-sun"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+          </svg>
+        </button>
         <button
           type="button"
           class="share-button"
@@ -76,30 +120,45 @@ const coverage = portFile
         (() => {
           const btn = document.querySelector('.share-button');
           const toast = document.querySelector('[data-copy-toast]');
-          if (!btn || !toast) return;
-          let toastTimer;
-          const showToast = () => {
-            toast.hidden = false;
-            clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-              toast.hidden = true;
-            }, 2000);
-          };
-          btn.addEventListener('click', async () => {
-            const url = window.location.href;
-            if (navigator.share) {
-              try {
-                await navigator.share({ url });
-                return;
-              } catch (err) {
-                if (err && err.name === 'AbortError') return;
+          if (btn && toast) {
+            let toastTimer;
+            const showToast = () => {
+              toast.hidden = false;
+              clearTimeout(toastTimer);
+              toastTimer = setTimeout(() => { toast.hidden = true; }, 2000);
+            };
+            btn.addEventListener('click', async () => {
+              const url = window.location.href;
+              if (navigator.share) {
+                try {
+                  await navigator.share({ url });
+                  return;
+                } catch (err) {
+                  if (err && err.name === 'AbortError') return;
+                }
               }
-            }
-            try {
-              await navigator.clipboard.writeText(url);
-              showToast();
-            } catch {}
-          });
+              try {
+                await navigator.clipboard.writeText(url);
+                showToast();
+              } catch {}
+            });
+          }
+
+          const themeBtn = document.querySelector('[data-theme-toggle]');
+          if (themeBtn) {
+            const currentTheme = () => {
+              const explicit = document.documentElement.getAttribute('data-theme');
+              if (explicit === 'light' || explicit === 'dark') return explicit;
+              return window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+            };
+            themeBtn.addEventListener('click', () => {
+              const next = currentTheme() === 'dark' ? 'light' : 'dark';
+              document.documentElement.setAttribute('data-theme', next);
+              try { localStorage.setItem('mare-theme', next); } catch (_) {}
+            });
+          }
         })();
       </script>
       {coverage?.windowIncomplete && (
