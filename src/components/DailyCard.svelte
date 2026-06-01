@@ -33,13 +33,17 @@
   const range = maxH - minH || 1;
 
   const W = 360;
-  const H = isToday ? 180 : 120;
+  const H = isToday ? 200 : 150;
   const PAD_X = 20;
-  const PAD_Y = isToday ? 36 : 24;
+  // Vertical reserves so the high-tide pill (cy - 28) and the hour-label
+  // strip (y = H - 8) never get clipped by the SVG viewBox.
+  const TOP_RESERVE = 40;
+  const BOTTOM_RESERVE = 28;
 
   const xOf = (t: Date) =>
     PAD_X + ((t.getTime() - dayStart.getTime()) / (dayEnd.getTime() - dayStart.getTime())) * (W - PAD_X * 2);
-  const yOf = (h: number) => H - PAD_Y - ((h - minH) / range) * (H - PAD_Y * 1.5);
+  const yOf = (h: number) =>
+    TOP_RESERVE + (1 - (h - minH) / range) * (H - TOP_RESERVE - BOTTOM_RESERVE);
 
   const linePath = curve
     .map((p, i) => `${i === 0 ? 'M' : 'L'}${xOf(p.t).toFixed(1)},${yOf(p.h).toFixed(1)}`)
@@ -47,7 +51,7 @@
 
   const fillPath =
     curve.length > 0
-      ? `${linePath} L${(W - PAD_X).toFixed(1)},${(H - PAD_Y).toFixed(1)} L${PAD_X.toFixed(1)},${(H - PAD_Y).toFixed(1)} Z`
+      ? `${linePath} L${(W - PAD_X).toFixed(1)},${(H - BOTTOM_RESERVE).toFixed(1)} L${PAD_X.toFixed(1)},${(H - BOTTOM_RESERVE).toFixed(1)} Z`
       : '';
 
   const weekdayLabel = new Intl.DateTimeFormat('pt-PT', {
@@ -96,8 +100,8 @@
       <line
         x1={m.x}
         x2={m.x}
-        y1={PAD_Y * 0.55}
-        y2={H - PAD_Y * 0.5}
+        y1={TOP_RESERVE - 10}
+        y2={H - BOTTOM_RESERVE + 4}
         stroke="var(--muted)"
         stroke-width="1"
         stroke-dasharray="2 3"
@@ -105,13 +109,13 @@
       />
       <text
         x={m.x}
-        y={PAD_Y * 0.45}
+        y={12}
         text-anchor="middle"
         font-size="11"
       >{m.glyph}</text>
       <text
         x={m.x}
-        y={PAD_Y * 0.45 + 10}
+        y={22}
         text-anchor="middle"
         font-size="9"
         fill="var(--muted)"
@@ -148,8 +152,8 @@
       <line
         x1={nx}
         x2={nx}
-        y1={PAD_Y * 0.4}
-        y2={H - PAD_Y * 0.5}
+        y1={6}
+        y2={H - BOTTOM_RESERVE + 4}
         stroke="var(--muted)"
         stroke-width="1"
         stroke-dasharray="2 3"
