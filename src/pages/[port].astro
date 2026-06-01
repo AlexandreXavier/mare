@@ -44,15 +44,25 @@ const coverage = portFile
       property="og:description"
       content={`Previsões de marés nos próximos 5 dias em ${port!.name}, Portugal.`}
     />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/icon-dark.svg" />
     <script is:inline>
       (() => {
+        const docEl = document.documentElement;
+        let theme;
         try {
           const saved = localStorage.getItem('mare-theme');
           if (saved === 'light' || saved === 'dark') {
-            document.documentElement.setAttribute('data-theme', saved);
+            docEl.setAttribute('data-theme', saved);
+            theme = saved;
           }
         } catch (_) {}
+        if (!theme) {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
+        }
+        const fav = document.getElementById('favicon');
+        if (fav) fav.href = theme === 'dark' ? '/icon-light.svg' : '/icon-dark.svg';
       })();
     </script>
   </head>
@@ -157,6 +167,8 @@ const coverage = portFile
             themeBtn.addEventListener('click', () => {
               const next = currentTheme() === 'dark' ? 'light' : 'dark';
               document.documentElement.setAttribute('data-theme', next);
+              const fav = document.getElementById('favicon');
+              if (fav) fav.setAttribute('href', next === 'dark' ? '/icon-light.svg' : '/icon-dark.svg');
               try { localStorage.setItem('mare-theme', next); } catch (_) {}
             });
           }
